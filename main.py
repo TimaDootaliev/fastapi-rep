@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import FastAPI
 import uvicorn
-from models import Blog
+from blog.models import Blog
 
 
 app = FastAPI()
