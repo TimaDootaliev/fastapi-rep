@@ -132,6 +132,7 @@ pip-selfcheck.json
 *.code-workspace
 __pycache__/
 __pycache__
+
 # Local History for Visual Studio Code
 .history/
 
