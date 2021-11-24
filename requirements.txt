@@ -12,3 +12,5 @@ SQLAlchemy==1.4.27
 starlette==0.16.0
 typing-extensions==4.0.0
 uvicorn==0.15.0
+passlib
+bcrypt
