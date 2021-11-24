@@ -3,61 +3,39 @@ from .. import schemas, models
 from ..database import get_db
 from typing import List
 from sqlalchemy.orm import Session
+from ..repository import blog
 
-router = APIRouter()
+router = APIRouter(
+    tags=['posts'],
+    prefix='/blog'
+)
 
 
-@router.get('/blog', response_model=List[schemas.ShowBlog], tags=['blogs'])
+@router.get('/', response_model=List[schemas.ShowBlog])
 def post_list(db: Session = Depends(get_db)):
     """ Просмотр всех записей """
-    blogs = db.query(models.Blog).all()
-    return blogs
+    return blog.post_list(db)
 
 
-@router.post('/blog', status_code=status.HTTP_201_CREATED, tags=['blogs'])
+@router.post('/', status_code=status.HTTP_201_CREATED)
 def create_post(request: schemas.Blog, db: Session = Depends(get_db)):
     """ Создание поста """
-    new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
-    db.add(new_blog)
-    db.commit()
-    db.refresh(new_blog)
-    return new_blog
+    return blog.create(request, db)
 
 
-@router.delete('/blog/{id}', status_code=status.HTTP_204_NO_CONTENT, tags=['blogs'])
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def destroy_post(id, db: Session = Depends(get_db)):
     """ Удаление записей """
-    blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog.first():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Post with the id {id} doesn\'t exist'
-        )
-    blog.delete(synchronize_session=False)
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return blog.delete(id, db)
 
 
-@router.put('/blog/{id}', status_code=status.HTTP_202_ACCEPTED, tags=['blogs'])
+@router.put('/{id}', status_code=status.HTTP_202_ACCEPTED)
 def update_post(id, request: schemas.Blog, db: Session = Depends(get_db)):
     """ Изменение поста """
-    blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with id {id} not found")
-
-    blog.update(request.dict())
-    db.commit()
-    return f'Post with id {id} updated'
+    return blog.alter(id, request, db)
 
 
-@router.get('/blog/{id}', status_code=200, response_model=schemas.ShowBlog, tags=['blogs'])
+@router.get('/{id}', status_code=200, response_model=schemas.ShowBlog)
 def post_detail(id, response: Response, db: Session = Depends(get_db)):
     """ Функция для просмотра деталей поста """
-    blog = db.query(models.Blog).filter(models.Blog.id==id).first()
-    if not blog:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f'Post with the id {id} doesn\'t exist'
-            )
-    return blog
+    return blog.details(id, db)
