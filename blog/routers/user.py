@@ -8,7 +8,7 @@ from ..repository import user
 
 router = APIRouter(
     tags=['user'],
-    prefix='/user'
+    prefix='/api/v^1/user'
 )
 
 

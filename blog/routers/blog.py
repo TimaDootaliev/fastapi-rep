@@ -8,7 +8,7 @@ from blog.ouath2 import get_current_user
 
 router = APIRouter(
     tags=['posts'],
-    prefix='/blog'
+    prefix='/api/v^1/blog'
 )
 
 
